@@ -1,0 +1,798 @@
+# DAX Measures
+
+---
+
+##  Sales & Profit Measures
+
+```dax
+Total Sales = 
+SUM(DataCoSupplyChainDataset_clean_processing[Sales])
+
+Total Profit = 
+SUM(DataCoSupplyChainDataset_clean_processing[Net_Profit])
+
+Profit Margin % = 
+DIVIDE([Total Profit], [Total Sales], 0)
+```
+
+---
+
+## Order Measures
+
+```dax
+Total Orders = 
+COUNTROWS(DataCoSupplyChainDataset_clean_processing)
+
+% of Total Orders = 
+DIVIDE(
+    COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+    CALCULATE(
+        COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+        ALL(DataCoSupplyChainDataset_clean_processing)
+    ),
+    0
+)
+```
+
+---
+
+## Delivery & Logistics Measures
+
+```dax
+On Time Orders = 
+CALCULATE(
+    COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+    DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Shipping on time"
+)
+
+On Time Rate % = 
+DIVIDE([On Time Orders], [Total Orders], 0)
+
+Late Orders = 
+CALCULATE(
+    [Total Orders],
+    DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Late"
+)
+
+Late Order Rate % = 
+DIVIDE([Late Orders], [Total Orders], 0)
+
+Early Orders = 
+CALCULATE(
+    COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+    DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Early"
+)
+
+Avg Shipping Days = 
+AVERAGE(DataCoSupplyChainDataset_clean_processing[Days for shipping (real)])
+
+Revenue at Risk = 
+CALCULATE(
+    [Total Sales],
+    DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Late"
+)
+
+Revenue Lost to Late Orders = 
+CALCULATE(
+    [Total Sales],
+    DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Late"
+)
+```
+
+---
+
+## Fraud & Risk Measures
+
+```dax
+Fraud Orders = 
+CALCULATE(
+    COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+    DataCoSupplyChainDataset_clean_processing[Order Status] = "Suspected Fraud"
+)
+
+Fraud Rate % = 
+DIVIDE(
+    CALCULATE(
+        COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+        DataCoSupplyChainDataset_clean_processing[Order Status] = "Suspected Fraud"
+    ),
+    COUNTROWS(DataCoSupplyChainDataset_clean_processing),
+    0
+)
+
+Revenue Lost to Fraud = 
+CALCULATE(
+    [Total Sales],
+    'DataCoSupplyChainDataset_clean_processing'[Order Status] = "Suspected Fraud"
+)
+
+---
+
+## Discount & Margin Measures
+
+```dax
+Avg Discount Rate = 
+AVERAGE(DataCoSupplyChainDataset_clean_processing[Discount_Rate])
+
+Profit Lost to Discount = 
+SUMX(
+    'DataCoSupplyChainDataset_clean_processing',
+    'DataCoSupplyChainDataset_clean_processing'[Sales] *
+    'DataCoSupplyChainDataset_clean_processing'[Discount_Rate]
+)
+
+Discount to Profit Ratio = 
+DIVIDE([Profit Lost to Discount], [Total Profit], 0)
+
+Margin vs Average = 
+VAR _DeptMargin = [Profit Margin %]
+VAR _AvgMargin = 
+    CALCULATE(
+        [Profit Margin %],
+        ALL('DataCoSupplyChainDataset_clean_processing'[Department])
+    )
+VAR _Diff = _DeptMargin - _AvgMargin
+RETURN
+    _Diff
+
+Most Discounted Dept = 
+FIRSTNONBLANK(
+    TOPN(
+        1,
+        VALUES('DataCoSupplyChainDataset_clean_processing'[Department]),
+        [Avg Discount Rate],
+        DESC
+    ),
+    1
+)
+```
+
+---
+
+## Department & Category Measures
+
+```dax
+Best Category = 
+FIRSTNONBLANK(
+    TOPN(1, VALUES(DataCoSupplyChainDataset_clean_processing[Category]), [Total Sales], DESC),
+    1
+)
+
+Worst Category = 
+FIRSTNONBLANK(
+    TOPN(1, VALUES(DataCoSupplyChainDataset_clean_processing[Category]), [Total Sales], ASC),
+    1
+)
+
+Highest Margin, Low Sales = 
+FIRSTNONBLANK(
+    TOPN(1, VALUES(DataCoSupplyChainDataset_clean_processing[Department]), [Total Sales], ASC),
+    1
+)
+```
+
+---
+
+## Calculated Columns
+
+```dax
+-- Date Table Columns
+Year = YEAR(DateTable[Date])
+Month = MONTH(DateTable[Date])
+Month Name = FORMAT(DateTable[Date], "MMMM")
+Quarter = "Q" & QUARTER(DateTable[Date])
+```
+
+---
+
+## "Last Year" Comparison Measures
+
+These return a descriptive text label (e.g. "vs $1.3M Last Year") and are designed to display blank (`""`) when no single year is selected via the Year slicer, rather than showing `0` or `--`.
+
+```dax
+Last Year Profit = 
+VAR _LY =
+    CALCULATE(
+        [Total Profit],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _LYMillions = DIVIDE(_LY, 1000000)
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LYMillions, "$#,##0.0") & "M Last Year"
+        )
+    )
+
+Last Year Sales = 
+VAR _LY =
+    CALCULATE(
+        [Total Sales],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _LYMillions = DIVIDE(_LY, 1000000)
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LYMillions, "$#,##0.0") & "M Last Year"
+        )
+    )
+
+Last Year Margin = 
+VAR _LY =
+    CALCULATE(
+        [Profit Margin %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "0.0%") & " Last Year"
+        )
+    )
+
+Last Year On Time Rate = 
+VAR _LY =
+    CALCULATE(
+        [On Time Rate],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "0.0%") & " Last Year"
+        )
+    )
+
+Last Year Late Delivery = 
+VAR _LY =
+    CALCULATE(
+        [Late Delivery Rate %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "0.0%") & " Last Year"
+        )
+    )
+
+Last Year Fraud Rate = 
+VAR _LY =
+    CALCULATE(
+        [Fraud Rate %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "0.0%") & " Last Year"
+        )
+    )
+
+Last Year Fraud Orders = 
+VAR _LY =
+    CALCULATE(
+        [Fraud Orders],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "#,##0") & " Last Year"
+        )
+    )
+
+Last Year Revenue Lost to Fraud = 
+VAR _LY =
+    CALCULATE(
+        [Revenue Lost to Fraud],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "$#,##0") & " Last Year"
+        )
+    )
+
+Last Year Revenue at Risk = 
+VAR _LY =
+    CALCULATE(
+        [Revenue at Risk],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _LYMillions = DIVIDE(_LY, 1000000)
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LYMillions, "$#,##0.0") & "M Last Year"
+        )
+    )
+
+Last Year Profit Lost to Discount = 
+VAR _LY =
+    CALCULATE(
+        [Profit Lost to Discount],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _LYMillions = DIVIDE(_LY, 1000000)
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LYMillions, "$#,##0.0") & "M Last Year"
+        )
+    )
+
+Last Year Discount to Profit Ratio = 
+VAR _LY =
+    CALCULATE(
+        [Discount to Profit Ratio],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "0.0%") & " Last Year"
+        )
+    )
+
+Last Year Discount Rate = 
+VAR _LY =
+    CALCULATE(
+        [Avg Discount Rate],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+RETURN
+    IF(
+        NOT HASONEVALUE('Date Table'[Year]),
+        "",
+        IF(
+            ISBLANK(_LY),
+            "No prior year",
+            "vs " & FORMAT(_LY, "0.0%") & " Last Year"
+        )
+    )
+```
+
+---
+
+## "% Change" Measures (YoY Trend Indicators)
+
+These return a formatted text string with a directional arrow (▲/▼) showing the year-over-year percentage change. By design, these display the full-period comparison regardless of slicer selection.
+
+```dax
+Sales % Change = 
+VAR _CM = [Total Sales]
+VAR _PM =
+    CALCULATE(
+        [Total Sales],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Profit % Change = 
+VAR _CM = [Total Profit]
+VAR _PM =
+    CALCULATE(
+        [Total Profit],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Profit Margin % Change = 
+VAR _CM = [Profit Margin %]
+VAR _PM =
+    CALCULATE(
+        [Profit Margin %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+On Time % Change = 
+VAR _CM = [On Time Rate]
+VAR _PM =
+    CALCULATE(
+        [On Time Rate],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Late Delivery % Change = 
+VAR _CM = [Late Delivery Rate %]
+VAR _PM =
+    CALCULATE(
+        [Late Delivery Rate %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Discount % Change = 
+VAR _CM = [Avg Discount Rate]
+VAR _PM =
+    CALCULATE(
+        [Avg Discount Rate],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Fraud Rate % Change = 
+VAR _CM = [Fraud Rate %]
+VAR _PM =
+    CALCULATE(
+        [Fraud Rate %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Revenue Lost Fraud Orders % Change = 
+VAR _CM = [Revenue Lost to Fraud]
+VAR _PM =
+    CALCULATE(
+        [Revenue Lost to Fraud],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Revenue at risk % Change = 
+VAR _CM = [Revenue at Risk]
+VAR _PM =
+    CALCULATE(
+        [Revenue at Risk],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Profit Lost to Discount % Change = 
+VAR _CM = [Profit Lost to Discount]
+VAR _PM =
+    CALCULATE(
+        [Profit Lost to Discount],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+
+Profit to discount ratio % Change = 
+VAR _CM = [Discount to Profit Ratio]
+VAR _PM =
+    CALCULATE(
+        [Discount to Profit Ratio],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+VAR _percformat = FORMAT(_perc, "+0.0%;-0.0%;0.0%")
+RETURN
+    IF(
+        _perc > 0,
+        UNICHAR(129157) & " " & _percformat,
+        UNICHAR(129158) & " " & _percformat
+    )
+```
+
+---
+
+## Conditional Formatting (CF) Measures
+
+These return a color name value used to drive conditional formatting on KPI cards based on year-over-year trend direction.
+
+### Standard logic — increase = improvement (Green when up)
+
+```dax
+CF Sales = 
+VAR _CM = [Total Sales]
+VAR _PM =
+    CALCULATE(
+        [Total Sales],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Green",
+        _perc < 0, "Red",
+        "Grey"
+    )
+
+CF Profit = 
+VAR _CM = [Total Profit]
+VAR _PM =
+    CALCULATE(
+        [Total Profit],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Green",
+        _perc < 0, "Red",
+        "Grey"
+    )
+
+CF Profit Margin = 
+VAR _CM = [Profit Margin %]
+VAR _PM =
+    CALCULATE(
+        [Profit Margin %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Green",
+        _perc < 0, "Red",
+        "Grey"
+    )
+
+CF On Time Rate = 
+VAR _CM = [On Time Rate]
+VAR _PM =
+    CALCULATE(
+        [On Time Rate],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Green",
+        _perc < 0, "Red",
+        "Grey"
+    )
+
+CF Discount Rate = 
+VAR _CM = [Avg Discount Rate]
+VAR _PM =
+    CALCULATE(
+        [Avg Discount Rate],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Green",
+        _perc < 0, "Red",
+        "Grey"
+    )
+
+CF Margin vs Avg = 
+VAR _Diff = [Margin vs Average]
+RETURN
+    SWITCH(
+        TRUE(),
+        _Diff > 0, "#4D7DAA",
+        _Diff < 0, "#A0D1FF",
+        "#888780"
+    )
+```
+
+```dax
+CF Late Delivery = 
+VAR _CM = [Late Delivery Rate %]
+VAR _PM =
+    CALCULATE(
+        [Late Delivery Rate %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+
+CF Fraud Rate = 
+VAR _CM = [Fraud Rate %]
+VAR _PM =
+    CALCULATE(
+        [Fraud Rate %],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+
+CF Fraud Orders = 
+VAR _CM = [Fraud Orders]
+VAR _PM =
+    CALCULATE(
+        [Fraud Orders],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+
+CF Revenue Lost to Fraud = 
+VAR _CM = [Revenue Lost to Fraud]
+VAR _PM =
+    CALCULATE(
+        [Revenue Lost to Fraud],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+
+CF Rev at Risk = 
+VAR _CM = [Revenue at Risk]
+VAR _PM =
+    CALCULATE(
+        [Revenue at Risk],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+
+CF Profit Loss = 
+VAR _CM = [Profit Lost to Discount]
+VAR _PM =
+    CALCULATE(
+        [Profit Lost to Discount],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+
+CF Discount to Profit Ratio = 
+VAR _CM = [Discount to Profit Ratio]
+VAR _PM =
+    CALCULATE(
+        [Discount to Profit Ratio],
+        DATEADD('Date Table'[Date], -1, YEAR)
+    )
+VAR _perc = DIVIDE(_CM - _PM, _PM)
+RETURN
+    SWITCH(
+        TRUE(),
+        _perc > 0, "Red",
+        _perc < 0, "Green",
+        "Grey"
+    )
+```

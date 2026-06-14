@@ -9,311 +9,213 @@ Power BI dashboard analyzing 61,000+ Supply chain orders across DataCo (2015-201
 
 ---
 
+# Sales, Logistics & Risk Performance Dashboard
+
 ## Project Overview
 
-This project analyzes **61,468 supply chain orders** from DataCo Global 
-across 2015–2017, uncovering critical operational failures, revenue risks, 
-and fraud patterns that were costing the business millions in lost revenue 
-and customer trust.
+This project analyzes 61,468 supply chain orders from DataCo Global across 2015 to 2017. The goal was to uncover operational problems, revenue risks, and fraud patterns that were affecting profitability and customer trust.
 
-**Tool Used:** Microsoft Power BI  
-**Dataset:** DataCo Supply Chain Dataset (Kaggle)  
-**Records Analyzed:** 61,468 orders  
-**Time Period:** 2015–2017 (2018 excluded — partial year data)  
-**Dashboard Pages:** 5 pages + drill-through
+**Tool Used:** Microsoft Power BI
+**Dataset:** DataCo Supply Chain Dataset (Kaggle)
+**Records Analyzed:** 61,468 orders
+**Time Period:** 2015 to 2017 (2018 excluded, since it only had partial year data)
+**Dashboard Pages:** 5 pages
 
 ---
 
 ## Business Questions Answered
 
-1. Are late deliveries affecting revenue and profit?
-2. Which departments and categories drive the most value?
-3. Where is fraud concentrated and what is its financial impact?
-4. Which customer segments experience the worst service?
-5. What are the root causes of operational decline?
+- Are late deliveries affecting revenue and profit?
+- Which departments and categories drive the most value?
+- Where is fraud concentrated, and what does it cost the business?
+- How do discounts affect profitability across departments and customer segments?
+- What are the root causes of the operational issues, and what should be done about them?
 
 ---
 
 ## Key Findings
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Total Revenue (2015-2017) | $34M |  
-| Revenue at Risk (Late Delivery) | $19M | Critical |
-| On-Time Delivery Rate | 48% |  Critical |
-| Profit Margin | 11% | Acceptable |
-| Suspected Fraud Orders | 4,000 | Concerning |
-| Cancellation Rate | 6% | Monitor |
+| Metric | Value | What this means |
+|---|---|---|
+| Total Sales (2015-2017) | $34.37M | Overall sales across the full period |
+| Total Profit (2015-2017) | $3.80M | Overall profit across the full period |
+| Profit Margin | 11.06% | Healthy, but discounting is eating into it |
+| Late Delivery Rate | 55.97% | Over half of all orders arrive late |
+| On-Time Delivery Rate | 48.39% | Less than half of orders ship on time |
+| Revenue at Risk (Late Delivery) | $19.18M | Sales tied to orders that arrived late |
+| Avg Discount Rate | 10.56% | Fairly consistent across departments |
+| Discount to Profit Ratio | 95.48% | Discounts are nearly wiping out total profit |
+| Profit Lost to Discount | $3.63M | Almost equal to total profit earned |
+| Fraud Rate | 2.31% | About 1 in 43 orders is flagged as suspected fraud |
+| Fraud Orders | 3,766 | Total number of suspected fraud orders |
+| Revenue Lost to Fraud | $788,912 | Sales tied to suspected fraud orders |
+| Total Orders | 61,468 | Full order count across 2015-2017 |
 
 ---
 
 ## Dashboard Pages
 
-### Page 1 — Overview
-![Overview](Page1-overview.png)
-High-level business snapshot with KPI cards, 
-top category performance, delivery breakdown 
-and revenue trend across 2015–2017.
+### Page 1 - Sales and Logistics Overview
 
-### Page 2 — Sales & Profitability
-![Sales](Page2-sales-profittability.png)
-Department-level profitability analysis, 
-customer segmentation, monthly trends 
-and profit margin vs delivery performance comparison.
+![Overview Page](Page1-overview.png)
 
-### Page 3 — Delivery & Operations
-![Delivery](Page3-delivery-operations.png)
-Root cause analysis of late deliveries by 
-department, country and shipping mode. 
-Fraud concentration analysis by market.
+A high-level snapshot of the business, with KPI cards for Total Profit, Total Sales, Late Delivery Rate, Profit Margin, and Total Orders. It also shows the top revenue-driving categories, a delivery status breakdown, customer segment revenue trends, and how sales, margin, and order volume compare across customer segments.
 
-### Page 4 — Recommendations
-![Recommendations](recommendations.png)
-Actionable business recommendations with 
-Problem → Action → Result framework and 
-priority matrix rated by Impact and Urgency.
+**Insights:**
+- Revenue dropped to $11.2M in 2017, down from $11.6M, mainly because of fewer orders rather than lower prices.
+- 56% of all orders arrive late, and this has stayed the same for three years in a row.
+- The Consumer segment brings in the most revenue, the highest margin, and the most orders.
+- Fishing is the top category, bringing in $6.8M in sales.
 
-### Category Detail — Drill Through
-![Drillthrough](Category-detail-drillthrough.png)
-Interactive drill-through from department 
-to category level performance analysis.
+**Observation:** Delivery has been delayed for three years straight, and revenue is decreasing.
+
+---
+
+### Page 2 - Department Profitability
+
+![Department Profitability Page](Page2-sales-profittability.png)
+
+A department-level look at profitability, comparing each department's margin to the company average. It includes a decomposition tree that breaks down total profit by department and category, and shows how each department's share of profit has shifted over the three years.
+
+**Insights:**
+- Despite having below-average margins, Outdoor and Apparel still bring in the most revenue.
+- Toys has the lowest sales but the highest margin (19%), making it a real missed opportunity.
+- Health & Beauty and Pets are the only departments with margins nearly 2 points below the company average.
+
+---
+
+### Page 3 - Discount & Pricing Analysis
+
+![Discount and Pricing Page](Page3-delivery-operations.png)
+
+A breakdown of discount rates by customer segment and department, a comparison of discount rate against profit margin by department, and discount rate trends by month and year.
+
+**Insights:**
+- Discounts ate up 95.48% of total profit, meaning almost every dollar of profit was offset by a discount.
+- Baby Products is the most discounted department, and Corporate is the most discounted customer segment.
+- Toys has both the lowest average discount rate (10.0%) and the highest profit margin (19.09%), showing that discounting and profitability don't move together in any consistent way across departments.
+- The average discount rate has stayed flat (10.4% to 10.6%) month to month, with no clear seasonal pattern.
+
+---
+
+### Page 4 - Delivery Performance
+
+![Delivery Performance Page](Page4-discount-and-pricing.png)
+
+A look at late delivery rate by year and shipping mode, a comparison of late delivery rate by shipping mode and customer segment, total orders versus late delivery rate by month, and revenue at risk by shipping mode.
+
+**Insights:**
+- 56% of all orders arrive late, and this hasn't changed from 2015 to 2017.
+- First Class shipping has a 97-98% late rate every single year, making it the worst performer despite being the most expensive option.
+- Standard Class carries the highest revenue at risk ($8M), simply because of how many orders go through it, even though it actually has the lowest late rate (39%).
+
+---
+
+### Page 5 - Fraud Risk Analysis
+
+![Fraud Risk Analysis Page](Page5-fraud-risk-analysis.png)
+
+Fraud rate trends by month and year, a Key Influencers analysis showing the strongest drivers of suspected fraud, and a breakdown of fraud rate by payment method.
+
+**Insights:**
+- 2.3% of orders are flagged as suspected fraud, about 3,766 orders in total.
+- Almost all suspected fraud is tied to Transfer payments. Cash, Debit, and Other payment methods show very little fraud by comparison.
+- Yemen, Trinidad and Tobago, and Bulgaria have fraud rates 3 to 7 times higher than the company average, despite having low order volumes.
+- Guinea has the highest overall fraud rate of any country.
+
+---
+
+## Recommendations
+
+### Logistics Failure
+
+**Problem:** 56% of all orders are delivered late. First Class shipments have a 97% delay rate.
+
+**Action:**
+- Immediately review or replace the First Class shipping provider.
+- Move high-priority orders to Standard or Same Day shipping.
+- Audit logistics partners with the highest late delivery volume.
+
+**Result:**
+- Fewer late deliveries
+- Recovered lost revenue
+- Better customer satisfaction
+
+---
+
+### Revenue Decline
+
+**Problem:** Orders declined, which brought revenue down from $11,589,112 to $11,192,354. Baby Products and Corporate get the highest discounts, but the overall discount rate stayed flat while revenue dropped, meaning discounting isn't what's driving sales.
+
+**Action:**
+- Focus on Toys, which has the highest profit margin (19%) but the lowest sales. A targeted marketing and inventory push here could boost profitability without needing more sales volume overall.
+- Launch focused campaigns in high-performing categories like Fishing and Cleats.
+- Re-engage inactive customers.
+- Improve order fulfilment speed.
+- Review discount levels for the Baby Products department and the Corporate segment.
+
+**Result:**
+- Higher order volume
+- More stable revenue growth
+- More repeat sales
+
+---
+
+### Fraud Concentration 
+
+**Problem:** About 4,000 suspected fraud orders are concentrated in specific countries, and 100% of those orders were paid via Transfer.
+
+**Action:**
+- Enforce stronger fraud detection in high-risk areas.
+- Add extra verification specifically for Transfer payments, since every fraud order used this method.
+- Flag repeat suspicious buyers.
+
+**Result:**
+- Lower financial losses
+- Better operating efficiency
+- Protected revenue
 
 ---
 
 ## Data Preparation & Cleaning
 
-The following steps were performed before building the dashboard:
+The following steps were done before building the dashboard:
 
 - Removed duplicate records
-- Standardized date formats for time accuracy
-- Created DateTable for accurate year/month calculations
-- Grouped 40+ product categories into logical department segments
+- Standardized date formats for accurate time-based calculations
+- Created a Date Table for year and month calculations
+- Grouped 40+ product categories into logical departments
 - Validated delivery status values across all records
-- Removed columns irrelevant to this analysis, including customer first name, last name and 
-  email address columns to reduce noise and ensure data privacy
-- Standardized text formatting by removing underscores, symbols and special characters 
-  across multiple columns for consistency and readability
-- Converted ALL CAPS text values to Proper Case formatting 
-- Excluded partial 2018 records to ensure only complete yearly data was analyzed
-- Replaced abreviated texts with their full spellings
-- Replaces country and city names spelt in Spanish with the English spellings using a maping table
+- Removed columns not needed for this analysis, including customer first name, last name, and email, to reduce noise and protect privacy
+- Standardized text formatting by removing underscores, symbols, and special characters across multiple columns
+- Converted ALL CAPS text values to Proper Case
+- Excluded partial 2018 records so only complete years were analyzed
+- Replaced abbreviated text values with their full spellings
+- Replaced Spanish country and city names with their English spellings using a mapping table
+
 ---
-
-## DAX Measures Created
-
-### Sales Measures
-```DAX
-Total Sales = SUM(DataCoSupplyChainDataset_clean_processing[Sales])
-
-PY Sales = VAR CurrentYear = SELECTEDVALUE(DateTable[Year])RETURN
-CALCULATE([Total Sales],DateTable[Year] = CurrentYear - 1)
-
-Sales YoY % = DIVIDE([Total Sales] - [PY Sales], [PY Sales], 0)
-```
-
-### Profit Measures
-```DAX
-Total Profit = SUM(DataCoSupplyChainDataset_clean_processing[Net_Profit])
-
-Profit Margin % = DIVIDE([Total Profit], [Total Sales], 0)
-```
-
-### Order Measures
-```DAX
-Total Orders = COUNTROWS(DataCoSupplyChainDataset_clean_processing[Order_id)
-
-% of Total Orders = DIVIDE(COUNTROWS(DataCoSupplyChainDataset_clean_processing),
-CALCULATE(COUNTROWS(DataCoSupplyChainDataset_clean_processing),ALL(DataCoSupplyChainDataset_clean_processing)), 0)
-```
-
-### Delivery Measures
-```DAX
-On Time Orders = CALCULATE(COUNTROWS(DataCoSupplyChainDataset_clean_processing),
-DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Shipping on time")
-
-On Time Rate % = 
-DIVIDE([On Time Orders], [Total Orders], 0)
-
-Late Orders = CALCULATE([Total Orders],
-DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Late")
-
-Late Order Rate % = DIVIDE([Late Orders], [Total Orders], 0)
-
-Avg Shipping Days = AVERAGE(DataCoSupplyChainDataset_clean_processing[Days for shipping (real)])
-
-Revenue at Risk = CALCULATE([Total Sales],
-DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Late")
-
-Early Orders = CALCULATECOUNTROWS(DataCoSupplyChainDataset_clean_processing),
-DataCoSupplyChainDataset_clean_processing[Delivery_Status] = "Early")
-```
-
-### Fraud & Risk Measures
-```DAX
-Fraud Orders = CALCULATE(COUNTROWS(DataCoSupplyChainDataset_clean_processing),
-DataCoSupplyChainDataset_clean_processing[Order_Status] = "SUSPECTED_FRAUD")
-
-Fraud Rate % = DIVIDE([Fraud Orders], [Total Orders], 0)
-
-Revenue Lost to Fraud = CALCULATE([Total Sales],
-DataCoSupplyChainDataset_clean_processing[Order_Status] = "SUSPECTED_FRAUD")
-```
-
-### Cancelled Orders Measures
-```DAX
-Cancelled Orders = CALCULATE(COUNTROWS(DataCoSupplyChainDataset_clean_processing),
-DataCoSupplyChainDataset_clean_processing[Order_Status] = "CANCELED")
-
-Cancellation Rate % = DIVIDE([Cancelled Orders], [Total Orders], 0)
-```
-
-### Department & Category Measures
-```DAX
-Best Category = FIRSTNONBLANK(TOPN(1, VALUES(DataCoSupplyChainDataset_clean_processing[Category]),
-[Total Sales],DESC), 1)
-
-Worst Category = FIRSTNONBLANK(TOPN(1,VALUES(DataCoSupplyChainDataset_clean_processing[Category]),
-[Total Sales],ASC), 1)
-```
-
-### Calculated Columns
-```DAX
--- DateTable Columns
-Year = YEAR(DateTable[Date])
-Month = MONTH(DateTable[Date])
-Month Name = FORMAT(DateTable[Date], "MMMM")
-Quarter = "Q" & QUARTER(DateTable[Date])
-
--- Main Table Columns
-Order Type = 
-SWITCH(TRUE(),
-    DataCoSupplyChainDataset_clean_processing[Order_Status] = "SUSPECTED_FRAUD", 
-        "Suspected Fraud",
-    DataCoSupplyChainDataset_clean_processing[Order_Status] = "COMPLETE", 
-        "Complete",
-    DataCoSupplyChainDataset_clean_processing[Order_Status] = "PENDING", 
-        "Pending",
-    DataCoSupplyChainDataset_clean_processing[Order_Status] = "IN_PROGRESS", 
-        "In Progress",
-    DataCoSupplyChainDataset_clean_processing[Order_Status] = "PAYMENT_REVIEW", 
-        "Payment Issue",
-    "Other"
-)
-```
-
-## Insights Summary
-
-- $19M in revenue is directly tied to late delivery orders more than half of total 
-  revenue is operationally at risk
-
-- 56% of all orders arrive late with only 48% on-time rate nearly half the 85% industry standard
-
-- First Class shipping has a 97% late delivery rate despite being the most premium option available
-
-- Second Class shipping performs at 70% late rate while Same Day sits at 47% suggesting 
-  faster options are more reliable
-
-- Standard Class has the best performance at 39% late rate the cheapest option outperforms all premium alternatives
-
-- The United States accounts for the highest volume of both late orders and fraudulent 
-  orders making it the most problematic market operationally
-
-- 4,000 suspected fraud orders are concentrated in the U.S., France and Mexico
-
-- Guinea and Syria show 10–12% fraud rates with orders being flagged and going unnoticed 
-  in smaller markets
-
-- Apparel and Outdoor departments each contribute 18K+ late orders the highest volume of any departments despite driving the most revenue
-
-- Outdoor generates $14.1M in sales the highest of any department but carries a  10.82% profit margin, below the Toys 
-  department at 19.09%
-
-- Toys has the highest profit margin at 19.09% but only 244 total orders the most underleveraged department in the business
-
-- Baby Products has the second highest margin at 13.06% with similarly low order volume, another missed opportunity
-
-- Monthly sales trends across 2015, and 2016 follow near identical patterns confirming sales are stable but not growing
-
-- Average order value sits at $211 consistent across the analysis period
-
-- 2018 data shows a sharp revenue drop however this reflects incomplete partial year records and was excluded from the main analysis to ensure accuracy
-- ----
-
-## Recommendations
-
-### 1. Overhaul First Class Shipping — Immediate
-First Class shipping is failing 97% of the time 
-despite being the most expensive option. This is 
-the single biggest operational failure in the 
-entire dataset. Customers paying premium prices 
-are receiving the worst service.
-
-Action: Immediately audit and replace the First Class shipping provider. Redirect high priority 
-orders to Standard Class which performs better at 39% late rate.
-
-Result: Even a 20% improvement in First Class performance would recover millions in customer 
-satisfaction and retention.
-
-### 2. Prioritize Logistics in Apparel and Outdoor
-These two departments generate the most revenue at $14M+ combined but also account for 36K+ 
-late orders between them. They are the highest risk departments operationally.
-
-Action: Dedicate logistics resources and performance monitoring specifically to Apparel 
-and Outdoor fulfillment operations.
-
-Result: Reducing late delivery in these two departments alone would significantly improve 
-the overall 56% late rate.
-
-### 3. Deploy Fraud Prevention
-4,000 fraud orders concentrated in the U.S., France and Mexico represent a deliberate exploitation pattern. Smaller markets like Guinea and Syria show high fraud rates that are going undetected.
-
-Action: Implement targeted fraud detection systems in high risk markets. Flag recurrent suspicious buyers automatically. Strengthen payment verification layers particularly for high value orders.
-
-Result: Minimize financial losses and protect 
-revenue from deliberate exploitation.
-
-### 4. Invest in Toys and Baby Products
-Toys carries a 19.09% profit margin the highest of any department but only generates 244 orders. 
-Baby Products follows at 13.06% with similarly low volume. Both are highly profitable but completely underleveraged.
-
-Action: Launch targeted marketing campaigns for Toys and Baby Products. Increase inventory 
-and visibility in high performing markets. Bundle with high volume categories to drive awareness.
-
-Result: Doubling order volume in these departments would meaningfully improve overall 
-profitability without increasing operational costs.
-
-### 5. Introduce Department Level Delivery KPIs
-Every department has a late delivery rate between 53% and 61%. The similarity across all departments suggests there are no 
-performance targets or accountability structures in place.
-
-Action: Set department specific on time delivery targets. Introduce monthly performance 
-reviews against those targets. Tie fulfillment partner contracts to delivery performance.
-
-Result: Creating accountability at department level will drive sustained improvement in overall delivery performance.
-
-----
 
 ## Tools & Skills Demonstrated
 
-- **Power BI** — Data modeling, DAX, visualizations, drill-through
-- **Data Cleaning** — Handling nulls, duplicates, date formatting
-- **DAX** — Time intelligence, CALCULATE, DIVIDE, SWITCH, FILTER
-- **Business Analysis** — KPI design, insight generation, recommendations
-- **Data Storytelling** — Multi-page narrative dashboard
+- **Power BI** - Data modeling, DAX, visualizations, decomposition trees, Key Influencers
+- **Data Cleaning** - Handling nulls, duplicates, date formatting, and text standardization
+- **DAX** - Time intelligence (DATEADD, SAMEPERIODLASTYEAR), CALCULATE, DIVIDE, SWITCH, and conditional formatting measures
+- **Business Analysis** - KPI design, insight generation, and recommendation frameworks
+- **Data Storytelling** - A multi-page dashboard that follows a problem, action, result structure
+
+See [DAX_Measures.md](DAX_Measures.txt) for the full list of DAX measures used in this project.
 
 ---
-
-## Dataset Source
-
-DataCo Supply Chain Dataset — available on Kaggle  
-[View Dataset](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis)
-
------
 
 ## Connect With Me
 
 - LinkedIn: [Your LinkedIn URL](https://www.linkedin.com/in/ekete-peace-a7837b275/)]
 - Email: [peaceekete8@gmail.com]
+
+  
+## Dataset Source
+DataCo Supply Chain Dataset — available on Kaggle  
+[View Dataset](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis)
 
 
   
